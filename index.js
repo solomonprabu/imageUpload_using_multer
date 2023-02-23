@@ -20,8 +20,8 @@ const upload = multer({storage: storage})
 app.set('views', path.join(__dirname, "views")); 
 app.set("view engine","ejs");
 
-app.get("/uploads", (req,res)=>{
-    res.render("uploads");
+app.get("/", (req,res)=>{
+    res.render('uploads');
 });
 
 app.post("/uploads", upload.single('image'), (req,res)=>{
@@ -29,4 +29,4 @@ app.post("/uploads", upload.single('image'), (req,res)=>{
 });
 
 app.listen(3001);
-// console.log("3001 is the port");
+console.log("3001 is the port");
