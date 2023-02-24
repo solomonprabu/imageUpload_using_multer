@@ -1,11 +1,11 @@
 const express = require("express");
 const app = express();
-const path = require("path");
+const path = require("path");         //Importing required libraries
 const multer = require("multer");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "Images");
+    cb(null, "Images");                //creating a storage destination for the uploaded files
   },
 
   filename: (req, file, cb) => {
@@ -15,15 +15,15 @@ const storage = multer.diskStorage({
       file.originalname.replace(/\.[^/.]/, "") +
         "_" +
         Date.now() +
-        path.extname(file.originalname)
+        path.extname(file.originalname)  //Adding timestamp to the file name to make it as an unique ID
     );
   },
 });
 
-const maxSize = 5 * 1000 * 1000;
+const maxSize = 5 * 1000 * 1000;    //Limiting the file size within 5MB to upload
 
 let upload = multer({
-  storage: storage,
+  storage: storage,                             //File conditions for uploading (i.e: size, type)
   limits: {
     fileSize: maxSize,
     fileFilter: function (res, file, cb) {
