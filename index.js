@@ -1,11 +1,11 @@
 const express = require("express");
 const app = express();
-const path = require("path");         //Importing required libraries
+const path = require("path"); //Importing required libraries
 const multer = require("multer");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "Images");                //creating a storage destination for the uploaded files
+    cb(null, "images"); //creating a storage destination for the uploaded files
   },
 
   filename: (req, file, cb) => {
@@ -15,34 +15,32 @@ const storage = multer.diskStorage({
       file.originalname.replace(/\.[^/.]/, "") +
         "_" +
         Date.now() +
-        path.extname(file.originalname)  //Adding timestamp to the file name to make it as an unique ID
+        path.extname(file.originalname) //Adding timestamp to the file name to make it as an unique ID
     );
   },
 });
 
-const maxSize = 5 * 1000 * 1000;    //Limiting the file size within 5MB to upload
+const maxSize = 2 * 1024 * 1024; //Limiting the file size within 5MB to upload
 
 let upload = multer({
-  storage: storage,                             //File conditions for uploading (i.e: size, type)
+  storage: storage, //File conditions for uploading (i.e: size, type)
   limits: {
     fileSize: maxSize,
-    fileFilter: function (res, file, cb) {
-      let filetypes = /jpeg,jpg,png/;
-      let mimetype = filetypes.test(file.mimetype);
-      let extname = filetypes.test(
-        path.extname(file.originalname).toLowerCase()
-      );
-
-      if (mimetype && extname) {
-        return cb(null, true);
-      }
-
-      cb(
-        "Error: File upload only supports the following filetypes: " + filetypes
-      );
-    },
   },
-});
+  fileFilter: function (req, file, cb) {
+    let filetypes = /jpeg|jpg|png/;
+    let mimetype = filetypes.test(file.mimetype);
+    let extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+
+    if (mimetype && extname) {
+      return cb(null, true);
+    }
+
+    cb(
+      "Error: File upload only supports the following filetypes: " + filetypes
+    );
+  },
+}).single("image");
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -51,7 +49,7 @@ app.get("/", (req, res) => {
   res.render("uploads");
 });
 
-app.post("/uploads", upload.single("image"), (req, res) => {
+app.post("/uploads", (req, res, next) => {
   upload(req, res, function (err) {
     if (err) {
       if (err instanceof multer.MulterError && err.code == "LIMIT_FILE_SIZE") {
